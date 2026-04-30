@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout Code') {
             steps {
                 checkout scm
@@ -12,8 +11,8 @@ pipeline {
         stage('Setup Python & Install Dependencies') {
             steps {
                 bat '''
-                py -m pip install --upgrade pip
-                py -m pip install -r backend/requirements.txt
+                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pip install --upgrade pip
+                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pip install -r backend\\requirements.txt
                 '''
             }
         }
@@ -21,7 +20,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 bat '''
-                py -m pytest
+                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pytest
                 '''
             }
         }
