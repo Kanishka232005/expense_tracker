@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- ✅ YOUR ORIGINAL STYLES (UNCHANGED) -->
+    <style>
+        /* (keeping your styles same) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container {
+            max-width: 1200px; margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .stats { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            padding: 20px; border-radius: 15px;
+        }
+        .main-content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .form-section, .expenses-section {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 20px;
+        }
+        input, select {
+            width: 100%; padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            width: 100%; padding: 12px;
+            border: none; border-radius: 10px;
+            background: #4facfe; color: white;
+            cursor: pointer;
+        }
+        .expense-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Expense Tracker</h1>
+
+        <div class="stats">
+
+            <!-- Daily Total -->
+            <div class="stat-card">
+                <div class="stat-number" id="dailyTotal">₹0.00</div>
+                <div class="stat-label">Today</div>
+            </div>
+
+            <!-- Monthly Total -->
+            <div class="stat-card">
+                <div class="stat-number" id="monthlyTotal">₹0.00</div>
+                <div class="stat-label">This Month</div>
+            </div>
+
+            <!-- Yearly Total -->
+            <div class="stat-card">
+                <div class="stat-number" id="yearlyTotal">₹0.00</div>
+                <div class="stat-label">This Year</div>
+            </div>
+
+            <!-- Expense Count -->
+            <div class="stat-card">
+                <div class="stat-number" id="expenseCount">0</div>
+                <div class="stat-label">Expenses</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <!-- FORM -->
+        <div class="form-section">
+            <form id="expenseForm">
+
+                <input 
+                    type="number" 
+                    id="amount" 
+                    name="amount" 
+                    placeholder="Amount" 
+                    required
+                >
+
+                <select 
+                    id="category" 
+                    name="category" 
+                    required
+                >
+                    <option value="">Select Category</option>
+                    <option value="food">Food</option>
+                    <option value="travel">Travel</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="bills">Bills</option>
+                    <option value="other">Other</option>
+                </select>
+
+                <input 
+                    type="text" 
+                    id="description" 
+                    name="description" 
+                    placeholder="Description" 
+                    required
+                >
+
+                <input 
+                    type="date" 
+                    id="date" 
+                    name="date"
+                >
+
+                <button type="submit" class="btn">
+                    Add Expense
+                </button>
+
+            </form>
+        </div>
+
+        <!-- EXPENSE LIST -->
+        <div class="expenses-section">
+            <div id="expensesList"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+class ExpenseTracker {
+    constructor() {
+        this.expenses = [];
+        this.init();
+    }
+
+    async init() {
+        this.bindEvents();
+        await this.loadExpenses();
+    }
+
+    bindEvents() {
+        document.getElementById('expenseForm').addEventListener('submit', (e) => {
+            e.preventDefault(); // ✅ prevent reload
+            this.addExpense();
+        });
+
+        document.getElementById('date').valueAsDate = new Date();
+    }
+
+    async loadExpenses() {
+        try {
+            const res = await fetch('/api/expenses');
+            this.expenses = await res.json();
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async addExpense() {
+        const formData = new FormData(document.getElementById('expenseForm'));
+        const data = Object.fromEntries(formData);
+
+        console.log("Sending:", data); // ✅ debug
+
+        try {
+            const res = await fetch('/api/expenses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+                this.expenses.push(result);
+                this.render();
+                this.updateStats();
+
+                document.getElementById('expenseForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+            } else {
+                alert(result.error);
+            }
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    render() {
+        const container = document.getElementById('expensesList');
+        container.innerHTML = '';
+
+        this.expenses.forEach(e => {
+            const div = document.createElement('div');
+            div.className = 'expense-item';
+            container.appendChild(div);
+        });
+    }
+
+    async updateStats() {
+    try {
+        const response = await fetch('/api/total');
+        const data = await response.json();
+
+        // Daily Total
+        document.getElementById('dailyTotal').textContent =
+            "₹" + data.daily_total.toLocaleString('en-IN', {
+                minimumFractionDigits: 2
+            });
+
+        // Current Month Total
+        document.getElementById('monthlyTotal').textContent =
+            "₹" + data.monthly_total.toLocaleString('en-IN', {
+                minimumFractionDigits: 2
+            });
+
+        // Yearly Total
+        document.getElementById('yearlyTotal').textContent =
+            "₹" + data.yearly_total.toLocaleString('en-IN', {
+                minimumFractionDigits: 2
+            });
+
+        // Expense Count
+        document.getElementById('expenseCount').textContent =
+            this.expenses.length;
+
+    } catch (error) {
+        console.error("Error updating stats:", error);
+    }
+}
+}
+
+const tracker = new ExpenseTracker();
+</script>
+
+</body>
+</html>

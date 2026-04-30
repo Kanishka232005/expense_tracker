@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "amount": 500.0,
+    "category": "food",
+    "description": "shop for 500",
+    "date": "2026-04-22"
+  },
+  {
+    "id": 2,
+    "amount": 500.0,
+    "category": "food",
+    "description": "shop for 450",
+    "date": "2026-04-22"
+  },
+  {
+    "id": 3,
+    "amount": 700.0,
+    "category": "bills",
+    "description": "670",
+    "date": "2026-04-22"
+  },
+  {
+    "id": 4,
+    "amount": 500.0,
+    "category": "shopping",
+    "description": "completed my shopping with 500rs",
+    "date": "2026-04-24"
+  },
+  {
+    "id": 5,
+    "amount": 200.0,
+    "category": "food",
+    "description": "lunch for rs200",
+    "date": "2026-04-24"
+  },
+  {
+    "id": 6,
+    "amount": 50.0,
+    "category": "travel",
+    "description": "from vadavalli to sitra",
+    "date": "2026-04-24"
+  },
+  {
+    "id": 7,
+    "amount": 500.0,
+    "category": "food",
+    "description": "500 for food",
+    "date": "2026-04-29"
+  },
+  {
+    "id": 8,
+    "amount": 1000.0,
+    "category": "shopping",
+    "description": "shopped for 1000",
+    "date": "2026-04-29"
+  },
+  {
+    "id": 9,
+    "amount": 100.0,
+    "category": "travel",
+    "description": "travel for 100",
+    "date": "2026-04-29"
+  }
+]
