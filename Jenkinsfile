@@ -38,7 +38,7 @@ pipeline {
                 bat '''
                 docker stop expense-tracker-container || exit 0
                 docker rm expense-tracker-container || exit 0
-                docker run -d -p 5000:5000 --name expense-tracker-container expense-tracker
+                docker run -d -p 5001:5000 --name expense-tracker-container expense-tracker
                 '''
             }
         }
