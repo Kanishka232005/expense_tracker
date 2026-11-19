@@ -21,7 +21,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 bat '''
-                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pytest tests\\test.py -v
+                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pytest tests\\test_app.py -v
                 '''
             }
         }
