@@ -1,17 +1,18 @@
+
 pipeline {
     agent any
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Setup Python & Install Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 bat '''
-                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pip install --upgrade pip
                 "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pip install -r backend\\requirements.txt
                 '''
             }
@@ -20,7 +21,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 bat '''
-                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pytest
+                "C:\\Users\\Kanishka\\AppData\\Local\\Programs\\Python\\Python310\\python.exe" -m pytest tests\\test.py -v
                 '''
             }
         }
@@ -33,14 +34,31 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Deploy Container') {
             steps {
                 bat '''
-                docker stop expense-tracker-container || exit 0
-                docker rm expense-tracker-container || exit 0
-                docker run -d -p 5001:5000 --name expense-tracker-container expense-tracker
+                docker rm -f expense-tracker-container 2>NUL || echo No previous container
+                docker run -d -p 5000:5000 --name expense-tracker-container expense-tracker
                 '''
             }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                bat '''
+                docker ps
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Expense Tracker CI/CD Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Expense Tracker CI/CD Pipeline failed. Check the console output.'
         }
     }
 }
